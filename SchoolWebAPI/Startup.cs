@@ -30,7 +30,7 @@ namespace SchoolWebAPI
         {
 
             //services.AddDbContext<SchoolDbContext>(o => o.UseInMemoryDatabase("SchoolDb"));
-            services.AddDbContext<SchoolDbContext>(o=>o.UseSqlServer(Configuration.GetConnectionString("DBConnection")));
+          services.AddDbContext<SchoolDbContext>(o=>o.UseSqlServer(Configuration.GetConnectionString("DBConnection")));
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {

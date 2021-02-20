@@ -8,9 +8,10 @@ namespace SchoolWebAPI.Models
 {
     public class Course
     {
-        [Key]
-        public int cId { get; set; }
+        
+        public int courseId { get; set; }
         public string Title { get; set; }
         public int CHr { get; set; }
+        public ICollection<Enrollment> Enrollment { get; set; }
     }
 }

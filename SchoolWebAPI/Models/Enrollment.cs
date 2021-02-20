@@ -1,16 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace SchoolWebAPI.Models
 {
     public class Enrollment
     {
-        [Key]
-        public int Id { get; set; }
-        public Student students{ get; set; }
-        public Course courses{ get; set; }
-}
+        public int studentId { get; set; }
+        [JsonIgnore]
+        public Student student{ get; set; }
+        public int courseId { get; set; }
+        [JsonIgnore]
+        public Course course { get; set; }
+    }
 }

@@ -25,14 +25,16 @@ namespace SchoolWebAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Student>>> GetStudent()
         {
-            return await _context.Student.ToListAsync();
+            //return await _context.Student.ToListAsync();
+            return await _context.Student.Include(e => e.Enrollment).ThenInclude(c => c.course).ToListAsync();
+
         }
 
         // GET: api/Students/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Student>> GetStudent(int id)
         {
-            var student = await _context.Student.FindAsync(id);
+            var student = await _context.Student.Include(e=>e.Enrollment).ThenInclude(c=>c.course).SingleOrDefaultAsync(s=>s.studentId==id);
 
             if (student == null)
             {
@@ -47,7 +49,7 @@ namespace SchoolWebAPI.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutStudent(int id, Student student)
         {
-            if (id != student.Id)
+            if (id != student.studentId)
             {
                 return BadRequest();
             }
@@ -56,6 +58,7 @@ namespace SchoolWebAPI.Controllers
 
             try
             {
+
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
@@ -81,7 +84,7 @@ namespace SchoolWebAPI.Controllers
             _context.Student.Add(student);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetStudent", new { id = student.Id }, student);
+            return CreatedAtAction("GetStudent", new { id = student.studentId }, student);
         }
 
         // DELETE: api/Students/5
@@ -102,7 +105,7 @@ namespace SchoolWebAPI.Controllers
 
         private bool StudentExists(int id)
         {
-            return _context.Student.Any(e => e.Id == id);
+            return _context.Student.Any(e => e.studentId == id);
         }
     }
 }

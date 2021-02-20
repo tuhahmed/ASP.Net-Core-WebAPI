@@ -23,16 +23,16 @@ namespace SchoolWebAPI.Controllers
 
         // GET: api/Enrollments
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Enrollment>>> GetEnrollments()
+        public async Task<ActionResult<IEnumerable<Enrollment>>> GetEnrollment()
         {
-            return await _context.Enrollments.ToListAsync();
+            return await _context.Enrollment.ToListAsync();
         }
 
         // GET: api/Enrollments/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Enrollment>> GetEnrollment(int id)
+        public async Task<ActionResult<Enrollment>> GetEnrollment(int cid, int sid)
         {
-            var enrollment = await _context.Enrollments.FindAsync(id);
+            var enrollment = await _context.Enrollment.SingleOrDefaultAsync(e=> e.studentId==sid && e.courseId==cid);
 
             if (enrollment == null)
             {
@@ -47,7 +47,7 @@ namespace SchoolWebAPI.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutEnrollment(int id, Enrollment enrollment)
         {
-            if (id != enrollment.Id)
+            if (id != enrollment.studentId)
             {
                 return BadRequest();
             }
@@ -78,23 +78,37 @@ namespace SchoolWebAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<Enrollment>> PostEnrollment(Enrollment enrollment)
         {
-            _context.Enrollments.Add(enrollment);
-            await _context.SaveChangesAsync();
+            _context.Enrollment.Add(enrollment);
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                if (EnrollmentExists(enrollment.studentId))
+                {
+                    return Conflict();
+                }
+                else
+                {
+                    throw;
+                }
+            }
 
-            return CreatedAtAction("GetEnrollment", new { id = enrollment.Id }, enrollment);
+            return CreatedAtAction("GetEnrollment", new { id = enrollment.studentId }, enrollment);
         }
 
         // DELETE: api/Enrollments/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteEnrollment(int id)
         {
-            var enrollment = await _context.Enrollments.FindAsync(id);
+            var enrollment = await _context.Enrollment.FindAsync(id);
             if (enrollment == null)
             {
                 return NotFound();
             }
 
-            _context.Enrollments.Remove(enrollment);
+            _context.Enrollment.Remove(enrollment);
             await _context.SaveChangesAsync();
 
             return NoContent();
@@ -102,7 +116,7 @@ namespace SchoolWebAPI.Controllers
 
         private bool EnrollmentExists(int id)
         {
-            return _context.Enrollments.Any(e => e.Id == id);
+            return _context.Enrollment.Any(e => e.studentId == id);
         }
     }
 }
